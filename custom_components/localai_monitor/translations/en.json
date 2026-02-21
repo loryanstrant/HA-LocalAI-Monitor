@@ -1,0 +1,48 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure LocalAI Monitor",
+        "description": "Set up your LocalAI Monitor integration",
+        "data": {
+          "url": "URL",
+          "api_key": "API Key (Optional)",
+          "verify_ssl": "Verify SSL Certificate",
+          "scan_interval": "Scan Interval (seconds)",
+          "name": "Name"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to LocalAI Monitor. Please check the URL and try again.",
+      "unknown": "An unexpected error occurred. Please check the logs."
+    },
+    "abort": {
+      "already_configured": "This LocalAI instance is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "LocalAI Monitor Options",
+        "description": "Update your LocalAI Monitor settings",
+        "data": {
+          "scan_interval": "Scan Interval (seconds)",
+          "verify_ssl": "Verify SSL Certificate"
+        }
+      }
+    }
+  },
+  "services": {
+    "shutdown_model": {
+      "name": "Shutdown model",
+      "description": "Shut down a specific LocalAI model to free up resources.",
+      "fields": {
+        "model_name": {
+          "name": "Model name",
+          "description": "The name of the model to shut down (e.g., \"gpt-4\", \"llama3-instruct\")."
+        }
+      }
+    }
+  }
+}
