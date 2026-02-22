@@ -2,10 +2,10 @@
   "domain": "localai_monitor",
   "name": "LocalAI Monitor",
   "version": "1.0.0",
-  "documentation": "https://github.com/yourusername/localai-homeassistant",
-  "issue_tracker": "https://github.com/yourusername/localai-homeassistant/issues",
+  "documentation": "https://github.com/loryanstrant/HA-LocalAI-Monitor",
+  "issue_tracker": "https://github.com/loryanstrant/HA-LocalAI-Monitor/issues",
   "requirements": [],
-  "codeowners": ["@yourusername"],
+  "codeowners": ["@loryanstrant"],
   "config_flow": true,
   "iot_class": "cloud_polling",
   "integration_type": "service"
