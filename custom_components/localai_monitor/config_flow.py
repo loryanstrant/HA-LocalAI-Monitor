@@ -44,7 +44,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     session = async_get_clientsession(hass, verify_ssl=verify_ssl)
 
     try:
-        async with async_timeout.timeout(10):
+        async with timeout(10):
             async with session.get(
                 f"{url}/system",
                 headers=headers,
@@ -67,13 +67,6 @@ class LocalAIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for LocalAI."""
 
     VERSION = 1
-
-    @staticmethod
-    def async_get_options_flow(
-        config_entry: config_entries.ConfigEntry,
-    ) -> config_entries.OptionsFlow:
-        """Get the options flow for this handler."""
-        return LocalAIOptionsFlowHandler(config_entry)
 
     @staticmethod
     def async_get_options_flow(
