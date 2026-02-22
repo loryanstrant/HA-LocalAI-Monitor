@@ -1,6 +1,6 @@
 # LocalAI Monitor - Home Assistant Integration
 
-A Home Assistant custom integration for monitoring LocalAI instances. Track installed models, backends, system resources, and manage running models directly from Home Assistant.
+A Home Assistant custom integration for monitoring [LocalAI](https://localai.io/) instances. Track installed models, backends, system resources, and manage running models directly from Home Assistant.
 
 ## Features
 
@@ -164,3 +164,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 <img width="256" height="256" alt="image" src="https://github.com/user-attachments/assets/3be6bfbc-f271-4236-9254-dd273488dc30" />
 
+## Disclaimer
+
+This integration is in no way affiliated with [LocalAI](https://localai.io/), but created out of appreciation.
