@@ -48,7 +48,6 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
             async with session.get(
                 f"{url}/system",
                 headers=headers,
-                ssl=verify_ssl,
             ) as response:
                 if response.status != 200:
                     raise ValueError(f"Failed to connect: HTTP {response.status}")
@@ -69,6 +68,13 @@ class LocalAIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
+    @staticmethod
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntry,
+    ) -> LocalAIOptionsFlowHandler:
+        """Get the options flow for this handler."""
+        return LocalAIOptionsFlowHandler(config_entry)
+
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
@@ -77,6 +83,10 @@ class LocalAIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             try:
+                # Check for duplicate entries
+                await self.async_set_unique_id(user_input[CONF_URL])
+                self._abort_if_unique_id_configured()
+                
                 info = await validate_input(self.hass, user_input)
             except ValueError as err:
                 _LOGGER.exception("Validation failed")

@@ -4,10 +4,10 @@ from html.parser import HTMLParser
 import logging
 from typing import Any
 
-import aiohttp
 import async_timeout
 
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
@@ -98,7 +98,7 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
         self.url = url.rstrip("/")
         self.api_key = api_key
         self.verify_ssl = verify_ssl
-        self.session = None
+        self._hass = hass
 
         super().__init__(
             hass,
@@ -109,30 +109,29 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
-        if self.session is None:
-            self.session = aiohttp.ClientSession()
+        session = async_get_clientsession(self._hass, verify_ssl=self.verify_ssl)
 
         try:
             async with async_timeout.timeout(30):
                 data = {}
                 
                 # Fetch backends
-                data[SENSOR_BACKENDS] = await self._fetch_endpoint(ENDPOINT_BACKENDS)
+                data[SENSOR_BACKENDS] = await self._fetch_endpoint(session, ENDPOINT_BACKENDS)
                 
                 # Fetch models
-                data[SENSOR_MODELS] = await self._fetch_endpoint(ENDPOINT_MODELS)
+                data[SENSOR_MODELS] = await self._fetch_endpoint(session, ENDPOINT_MODELS)
                 
                 # Fetch model jobs
-                data[SENSOR_MODELS_JOBS] = await self._fetch_endpoint(ENDPOINT_MODELS_JOBS)
+                data[SENSOR_MODELS_JOBS] = await self._fetch_endpoint(session, ENDPOINT_MODELS_JOBS)
                 
                 # Fetch system info
-                data[SENSOR_SYSTEM] = await self._fetch_endpoint(ENDPOINT_SYSTEM)
+                data[SENSOR_SYSTEM] = await self._fetch_endpoint(session, ENDPOINT_SYSTEM)
                 
                 # Fetch resources (undocumented)
-                data[SENSOR_RESOURCES] = await self._fetch_endpoint(ENDPOINT_RESOURCES)
+                data[SENSOR_RESOURCES] = await self._fetch_endpoint(session, ENDPOINT_RESOURCES)
                 
                 # Parse model details from /manage page HTML
-                model_details = await self._fetch_model_details()
+                model_details = await self._fetch_model_details(session)
                 if model_details:
                     data["model_details"] = model_details
                 
@@ -143,7 +142,7 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
         except Exception as err:
             raise UpdateFailed(f"Unexpected error: {err}") from err
 
-    async def _fetch_endpoint(self, endpoint: str) -> dict[str, Any] | list[Any] | None:
+    async def _fetch_endpoint(self, session, endpoint: str) -> dict[str, Any] | list[Any] | None:
         """Fetch data from a specific endpoint."""
         url = f"{self.url}{endpoint}"
         headers = {}
@@ -152,10 +151,9 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
             headers["Authorization"] = f"Bearer {self.api_key}"
 
         try:
-            async with self.session.get(
+            async with session.get(
                 url,
                 headers=headers,
-                ssl=self.verify_ssl,
             ) as response:
                 if response.status == 200:
                     return await response.json()
@@ -164,14 +162,11 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
                         "Failed to fetch %s: HTTP %s", endpoint, response.status
                     )
                     return None
-        except aiohttp.ClientError as err:
+        except Exception as err:
             _LOGGER.warning("Error fetching %s: %s", endpoint, err)
             return None
-        except Exception as err:
-            _LOGGER.warning("Unexpected error fetching %s: %s", endpoint, err)
-            return None
 
-    async def _fetch_model_details(self) -> dict[str, dict[str, Any]] | None:
+    async def _fetch_model_details(self, session) -> dict[str, dict[str, Any]] | None:
         """Fetch and parse model details from /manage page HTML."""
         url = f"{self.url}/manage"
         headers = {"Accept": "text/html"}
@@ -180,10 +175,9 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
             headers["Authorization"] = f"Bearer {self.api_key}"
 
         try:
-            async with self.session.get(
+            async with session.get(
                 url,
                 headers=headers,
-                ssl=self.verify_ssl,
             ) as response:
                 if response.status == 200:
                     html = await response.text()
@@ -193,12 +187,18 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
                     # Convert list to dict keyed by model name
                     model_dict = {}
                     for model in parser.models:
-                        model_dict[model['name']] = {
-                            'backend': model['backend'],
-                            'status': 'Running' if 'Running' in model['status'] else 'Idle',
-                            'usecases': model['usecases'],
-                            'mcp_enabled': 'MCP' in model['status'],
-                        }
+                        try:
+                            if not model.get('name'):
+                                continue
+                            model_dict[model['name']] = {
+                                'backend': model.get('backend', 'unknown'),
+                                'status': 'Running' if 'Running' in model.get('status', []) else 'Idle',
+                                'usecases': model.get('usecases', []),
+                                'mcp_enabled': 'MCP' in model.get('status', []),
+                            }
+                        except (KeyError, TypeError, AttributeError) as err:
+                            _LOGGER.debug("Skipping model due to parsing error: %s", err)
+                            continue
                     
                     _LOGGER.info(
                         "Parsed %d models from /manage page (first 3: %s)",
@@ -215,8 +215,3 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
         except Exception as err:
             _LOGGER.warning("Error parsing model details from HTML: %s", err)
             return None
-
-    async def async_shutdown(self) -> None:
-        """Close the session."""
-        if self.session:
-            await self.session.close()

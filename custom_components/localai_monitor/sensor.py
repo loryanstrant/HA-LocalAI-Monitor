@@ -74,8 +74,9 @@ class LocalAISensorBase(CoordinatorEntity, SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return additional state attributes."""
+        last_update = getattr(self.coordinator, "last_update_success_time", None)
         attrs = {
-            ATTR_LAST_UPDATE: datetime.now().isoformat(),
+            ATTR_LAST_UPDATE: last_update.isoformat() if last_update is not None else None,
         }
         
         # Add sensor-specific attributes (implemented in subclasses)
@@ -359,26 +360,40 @@ class LocalAIResourcesSensor(LocalAISensorBase):
             attrs["gpu_count"] = agg.get("gpu_count")
             
             # Format memory in GB for easier reading
-            if attrs["total_memory"]:
-                attrs["total_memory_gb"] = round(attrs["total_memory"] / (1024**3), 2)
-            if attrs["used_memory"]:
-                attrs["used_memory_gb"] = round(attrs["used_memory"] / (1024**3), 2)
-            if attrs["free_memory"]:
-                attrs["free_memory_gb"] = round(attrs["free_memory"] / (1024**3), 2)
+            total_memory = attrs.get("total_memory")
+            used_memory = attrs.get("used_memory")
+            free_memory = attrs.get("free_memory")
+            
+            if isinstance(total_memory, (int, float)) and total_memory != 0:
+                attrs["total_memory_gb"] = round(total_memory / (1024**3), 2)
+            if isinstance(used_memory, (int, float)):
+                attrs["used_memory_gb"] = round(used_memory / (1024**3), 2)
+            if isinstance(free_memory, (int, float)):
+                attrs["free_memory_gb"] = round(free_memory / (1024**3), 2)
         
         # Add GPU information
         if "gpus" in data and isinstance(data["gpus"], list):
             gpu_list = []
             for gpu in data["gpus"]:
                 if isinstance(gpu, dict):
+                    total_vram = gpu.get("total_vram")
+                    used_vram = gpu.get("used_vram")
+                    free_vram = gpu.get("free_vram")
+                    
                     gpu_info = {
                         "index": gpu.get("index"),
                         "name": gpu.get("name"),
                         "vendor": gpu.get("vendor"),
                         "usage_percent": gpu.get("usage_percent"),
-                        "total_vram_gb": round(gpu.get("total_vram", 0) / (1024**3), 2),
-                        "used_vram_gb": round(gpu.get("used_vram", 0) / (1024**3), 2),
-                        "free_vram_gb": round(gpu.get("free_vram", 0) / (1024**3), 2),
+                        "total_vram_gb": round(total_vram / (1024**3), 2)
+                        if isinstance(total_vram, (int, float)) and total_vram != 0
+                        else None,
+                        "used_vram_gb": round(used_vram / (1024**3), 2)
+                        if isinstance(used_vram, (int, float))
+                        else None,
+                        "free_vram_gb": round(free_vram / (1024**3), 2)
+                        if isinstance(free_vram, (int, float))
+                        else None,
                     }
                     gpu_list.append(gpu_info)
             attrs["gpus"] = gpu_list
