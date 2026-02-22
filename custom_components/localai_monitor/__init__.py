@@ -97,14 +97,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                         json={"model": model_name},
                         headers=headers,
                     ) as response:
-                    if response.status == 200:
-                        _LOGGER.info("Successfully shut down model: %s", model_name)
-                        # Trigger coordinator refresh to update status
-                        await coordinator.async_request_refresh()
-                    else:
-                        error_msg = f"Failed to shut down model {model_name}: HTTP {response.status}"
-                        _LOGGER.error(error_msg)
-                        raise HomeAssistantError(error_msg)
+                        if response.status == 200:
+                            _LOGGER.info("Successfully shut down model: %s", model_name)
+                            # Trigger coordinator refresh to update status
+                            await coordinator.async_request_refresh()
+                        else:
+                            error_msg = f"Failed to shut down model {model_name}: HTTP {response.status}"
+                            _LOGGER.error(error_msg)
+                            raise HomeAssistantError(error_msg)
             except HomeAssistantError:
                 raise
             except Exception as err:
