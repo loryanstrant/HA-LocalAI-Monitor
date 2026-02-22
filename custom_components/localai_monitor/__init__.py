@@ -90,11 +90,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             session = async_get_clientsession(hass, verify_ssl=coordinator.verify_ssl)
             
             try:
-                async with session.post(
-                    url,
-                    json={"model": model_name},
-                    headers=headers,
-                ) as response:
+                from asyncio import timeout
+                async with timeout(10):
+                    async with session.post(
+                        url,
+                        json={"model": model_name},
+                        headers=headers,
+                    ) as response:
                     if response.status == 200:
                         _LOGGER.info("Successfully shut down model: %s", model_name)
                         # Trigger coordinator refresh to update status

@@ -1,11 +1,11 @@
 """Config flow for LocalAI Manager integration."""
 from __future__ import annotations
 
+from asyncio import timeout
 import logging
 from typing import Any
 
 import aiohttp
-import async_timeout
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -67,6 +67,13 @@ class LocalAIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for LocalAI."""
 
     VERSION = 1
+
+    @staticmethod
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntry,
+    ) -> config_entries.OptionsFlow:
+        """Get the options flow for this handler."""
+        return LocalAIOptionsFlowHandler(config_entry)
 
     @staticmethod
     def async_get_options_flow(

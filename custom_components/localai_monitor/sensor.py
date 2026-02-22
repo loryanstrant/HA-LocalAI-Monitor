@@ -299,6 +299,24 @@ class LocalAISystemSensor(LocalAISensorBase):
         
         return "online"
 
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return additional state attributes with full system information."""
+        attrs = super().extra_state_attributes
+
+        if not self.coordinator.data or SENSOR_SYSTEM not in self.coordinator.data:
+            return attrs
+
+        data = self.coordinator.data[SENSOR_SYSTEM]
+        if data is None:
+            return attrs
+
+        if isinstance(data, dict):
+            # Expose all system data as attributes
+            attrs.update(data)
+
+        return attrs
+
 
 class LocalAIResourcesSensor(LocalAISensorBase):
     """Sensor for LocalAI resources (undocumented endpoint)."""
@@ -342,6 +360,8 @@ class LocalAIResourcesSensor(LocalAISensorBase):
     def available(self) -> bool:
         """Return if entity is available."""
         if not self.coordinator.last_update_success:
+            return False
+        if not self.coordinator.data:
             return False
         data = self.coordinator.data.get(SENSOR_RESOURCES)
         return data is not None and isinstance(data, dict)

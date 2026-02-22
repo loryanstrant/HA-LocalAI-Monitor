@@ -1,11 +1,11 @@
 """Data coordinator for the LocalAI Manager integration."""
+from asyncio import timeout
 from datetime import timedelta
 from html.parser import HTMLParser
 import logging
 from typing import Any
 
 import aiohttp
-import async_timeout
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -45,43 +45,54 @@ class ModelTableParser(HTMLParser):
         
     def handle_starttag(self, tag, attrs):
         """Handle opening tags."""
-        if tag == 'tbody':
-            self.in_tbody = True
-        elif tag == 'tr' and self.in_tbody:
-            self.current_col = 0
-            self.current_row = {'name': '', 'status': [], 'backend': '', 'usecases': []}
-        elif tag == 'td' and self.in_tbody:
-            self.in_td = True
+        try:
+            if tag == 'tbody':
+                self.in_tbody = True
+            elif tag == 'tr' and self.in_tbody:
+                self.current_col = 0
+                self.current_row = {'name': '', 'status': [], 'backend': '', 'usecases': []}
+            elif tag == 'td' and self.in_tbody:
+                self.in_td = True
+        except (AttributeError, KeyError, TypeError) as err:
+            _LOGGER.debug("Error in handle_starttag: %s", err)
             
     def handle_endtag(self, tag):
         """Handle closing tags."""
-        if tag == 'tbody':
-            self.in_tbody = False
-        elif tag == 'td':
-            self.in_td = False
-            self.current_col += 1
-        elif tag == 'tr' and self.in_tbody and self.current_row['name']:
-            self.models.append(self.current_row.copy())
+        try:
+            if tag == 'tbody':
+                self.in_tbody = False
+            elif tag == 'td':
+                self.in_td = False
+                self.current_col += 1
+            elif tag == 'tr' and self.in_tbody and self.current_row.get('name'):
+                self.models.append(self.current_row.copy())
+        except (AttributeError, KeyError, TypeError) as err:
+            _LOGGER.debug("Error in handle_endtag: %s", err)
             
     def handle_data(self, data):
         """Handle text data within tags."""
-        if self.in_td:
-            data = data.strip()
-            if not data:
-                return
-                
-            # Column 0: Name
-            if self.current_col == 0 and not self.current_row['name']:
-                self.current_row['name'] = data
-            # Column 1: Status (Running, MCP, etc.)
-            elif self.current_col == 1:
-                self.current_row['status'].append(data)
-            # Column 2: Backend
-            elif self.current_col == 2 and not self.current_row['backend']:
-                self.current_row['backend'] = data
-            # Column 3: Use Cases
-            elif self.current_col == 3:
-                self.current_row['usecases'].append(data)
+        try:
+            if self.in_td:
+                data = data.strip()
+                if not data:
+                    return
+                    
+                # Column 0: Name
+                if self.current_col == 0 and not self.current_row.get('name'):
+                    self.current_row['name'] = data
+                # Column 1: Status (Running, MCP, etc.)
+                elif self.current_col == 1:
+                    if isinstance(self.current_row.get('status'), list):
+                        self.current_row['status'].append(data)
+                # Column 2: Backend
+                elif self.current_col == 2 and not self.current_row.get('backend'):
+                    self.current_row['backend'] = data
+                # Column 3: Use Cases
+                elif self.current_col == 3:
+                    if isinstance(self.current_row.get('usecases'), list):
+                        self.current_row['usecases'].append(data)
+        except (AttributeError, KeyError, TypeError) as err:
+            _LOGGER.debug("Error in handle_data: %s", err)
 
 
 class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
@@ -113,7 +124,7 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
         session = async_get_clientsession(self._hass, verify_ssl=self.verify_ssl)
 
         try:
-            async with async_timeout.timeout(30):
+            async with timeout(30):
                 data = {}
                 
                 # Fetch backends
@@ -185,11 +196,20 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
                     parser = ModelTableParser()
                     parser.feed(html)
                     
+                    # Validate that we got some models
+                    if not parser.models:
+                        _LOGGER.warning("No models found in /manage page - HTML structure may have changed")
+                        return None
+                    
                     # Convert list to dict keyed by model name
                     model_dict = {}
                     for model in parser.models:
                         try:
                             if not model.get('name'):
+                                continue
+                            # Validate that model has expected fields
+                            if not isinstance(model.get('status'), list) or not isinstance(model.get('usecases'), list):
+                                _LOGGER.debug("Skipping model %s - invalid data structure", model.get('name'))
                                 continue
                             model_dict[model['name']] = {
                                 'backend': model.get('backend', 'unknown'),
@@ -200,6 +220,10 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
                         except (KeyError, TypeError, AttributeError) as err:
                             _LOGGER.debug("Skipping model due to parsing error: %s", err)
                             continue
+                    
+                    if not model_dict:
+                        _LOGGER.warning("Failed to parse any valid models from /manage page")
+                        return None
                     
                     _LOGGER.info(
                         "Parsed %d models from /manage page (first 3: %s)",
