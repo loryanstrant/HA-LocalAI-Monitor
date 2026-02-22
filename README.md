@@ -1,6 +1,6 @@
 # LocalAI Monitor - Home Assistant Integration
 
-A Home Assistant custom integration for monitoring LocalAI instances. Track installed models, backends, system resources, and manage running models directly from Home Assistant.
+A Home Assistant custom integration for monitoring [LocalAI](https://localai.io/) instances. Track installed models, backends, system resources, and manage running models directly from Home Assistant.
 
 ## Features
 
@@ -50,15 +50,24 @@ Configure the integration through the UI:
 
 ## Sensors
 
+<img width="508" height="502" alt="image" src="https://github.com/user-attachments/assets/3bb9fecc-11d3-47f8-ba04-3b62edbbdb5b" />
+
+
 The integration provides the following sensors:
 
 ### Installed Models
 - **State**: Number of installed models
 - **Attributes**: Detailed list of models with backend, status, use cases, and MCP status
 
+<img width="1803" height="954" alt="image" src="https://github.com/user-attachments/assets/d08cf45b-7a66-4025-a85f-1d390740bc15" />
+
+
 ### Installed Backends
 - **State**: Number of installed backends
 - **Attributes**: List of backends with installation metadata
+
+<img width="1808" height="658" alt="image" src="https://github.com/user-attachments/assets/9f3de8e1-e98f-46bb-99ae-19894b382375" />
+
 
 ### System
 - **State**: System status
@@ -67,6 +76,9 @@ The integration provides the following sensors:
 ### Resources
 - **State**: Resource status
 - **Attributes**: Resource usage information
+
+<img width="1810" height="984" alt="Resource usage sensor screenshot in Home Assistant" src="https://github.com/user-attachments/assets/4c385b39-2145-4987-a044-bc87e713be35" />
+
 
 ### Model Jobs
 - **State**: Number of active jobs
@@ -88,6 +100,9 @@ data:
   model_name: "gpt-4"
 ```
 
+<img width="1837" height="722" alt="image" src="https://github.com/user-attachments/assets/2080f51d-157a-48ee-8e25-6f59fc95d7ca" />
+
+
 ## Use Cases
 
 ### Automation Example: Shutdown Idle Models
@@ -103,6 +118,7 @@ automation:
         data:
           model_name: "gpt-4"
 ```
+
 
 ### Dashboard Example
 
@@ -144,6 +160,10 @@ For issues, feature requests, or contributions, please visit the [GitHub reposit
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Credits
+## Development Approach
 
-Developed by [@loryanstrant](https://github.com/loryanstrant)
+<img width="256" height="256" alt="Development approach diagram for the LocalAI Monitor integration" src="https://github.com/user-attachments/assets/3be6bfbc-f271-4236-9254-dd273488dc30" />
+
+## Disclaimer
+
+This integration is in no way affiliated with [LocalAI](https://localai.io/), but created out of appreciation.
