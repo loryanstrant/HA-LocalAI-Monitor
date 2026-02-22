@@ -77,7 +77,7 @@ The integration provides the following sensors:
 - **State**: Resource status
 - **Attributes**: Resource usage information
 
-<img width="1810" height="984" alt="image" src="https://github.com/user-attachments/assets/4c385b39-2145-4987-a044-bc87e713be35" />
+<img width="1810" height="984" alt="Resource usage sensor screenshot in Home Assistant" src="https://github.com/user-attachments/assets/4c385b39-2145-4987-a044-bc87e713be35" />
 
 
 ### Model Jobs
