@@ -83,8 +83,9 @@ class LocalAIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             try:
-                # Check for duplicate entries
-                await self.async_set_unique_id(user_input[CONF_URL])
+                # Check for duplicate entries - normalize URL first
+                normalized_url = user_input[CONF_URL].rstrip("/")
+                await self.async_set_unique_id(normalized_url)
                 self._abort_if_unique_id_configured()
                 
                 info = await validate_input(self.hass, user_input)

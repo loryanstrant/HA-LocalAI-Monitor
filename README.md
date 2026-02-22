@@ -133,7 +133,7 @@ entities:
 
 ## Requirements
 
-- Home Assistant 2023.1 or newer
+- Home Assistant 2025.10.0 or newer
 - A running LocalAI instance
 
 ## Support

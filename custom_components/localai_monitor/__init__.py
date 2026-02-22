@@ -9,6 +9,7 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME, Platform
 from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
@@ -99,13 +100,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                         # Trigger coordinator refresh to update status
                         await coordinator.async_request_refresh()
                     else:
-                        _LOGGER.error(
-                            "Failed to shut down model %s: HTTP %s",
-                            model_name,
-                            response.status,
-                        )
+                        error_msg = f"Failed to shut down model {model_name}: HTTP {response.status}"
+                        _LOGGER.error(error_msg)
+                        raise HomeAssistantError(error_msg)
+            except HomeAssistantError:
+                raise
             except Exception as err:
-                _LOGGER.error("Error shutting down model %s: %s", model_name, err)
+                error_msg = f"Error shutting down model {model_name}: {err}"
+                _LOGGER.error(error_msg)
+                raise HomeAssistantError(error_msg) from err
         
         hass.services.async_register(
             DOMAIN,

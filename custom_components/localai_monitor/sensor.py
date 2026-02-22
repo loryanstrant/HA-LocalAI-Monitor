@@ -316,19 +316,19 @@ class LocalAIResourcesSensor(LocalAISensorBase):
         self._attr_suggested_display_precision = 2
 
     @property
-    def native_value(self) -> str | float:
+    def native_value(self) -> float | None:
         """Return the state of the sensor."""
         if not self.coordinator.data or SENSOR_RESOURCES not in self.coordinator.data:
-            return "unknown"
+            return None
         
         data = self.coordinator.data[SENSOR_RESOURCES]
         if data is None:
-            return "unavailable"
+            return None
         
         if isinstance(data, dict):
             # Check if available
             if not data.get("available", False):
-                return "unavailable"
+                return None
             
             # Get usage percent from aggregate
             if "aggregate" in data and isinstance(data["aggregate"], dict):
@@ -336,7 +336,15 @@ class LocalAIResourcesSensor(LocalAISensorBase):
                 if usage is not None:
                     return round(float(usage), 2)
         
-        return "unknown"
+        return None
+
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        if not self.coordinator.last_update_success:
+            return False
+        data = self.coordinator.data.get(SENSOR_RESOURCES)
+        return data is not None and isinstance(data, dict)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:

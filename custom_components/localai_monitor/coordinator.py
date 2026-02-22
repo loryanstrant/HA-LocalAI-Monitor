@@ -4,6 +4,7 @@ from html.parser import HTMLParser
 import logging
 from typing import Any
 
+import aiohttp
 import async_timeout
 
 from homeassistant.core import HomeAssistant
