@@ -1,0 +1,12 @@
+# Services for LocalAI Manager integration
+shutdown_model:
+  name: Shutdown model
+  description: Shut down a specific LocalAI model to free up resources.
+  fields:
+    model_name:
+      name: Model name
+      description: The name of the model to shut down (e.g., "gpt-4", "llama3-instruct").
+      required: true
+      example: "gpt-4"
+      selector:
+        text:
