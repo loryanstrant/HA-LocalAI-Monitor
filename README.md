@@ -162,7 +162,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Development Approach
 
-<img width="256" height="256" alt="image" src="https://github.com/user-attachments/assets/3be6bfbc-f271-4236-9254-dd273488dc30" />
+<img width="256" height="256" alt="Development approach diagram for the LocalAI Monitor integration" src="https://github.com/user-attachments/assets/3be6bfbc-f271-4236-9254-dd273488dc30" />
 
 ## Disclaimer
 
