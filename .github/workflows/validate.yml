@@ -10,10 +10,12 @@ on:
 permissions: {}
 
 jobs:
-  validate-hacs:
+  validate:
     runs-on: "ubuntu-latest"
     steps:
       - name: HACS validation
         uses: "hacs/action@main"
         with:
           category: "integration"
+      - name: Hassfest validation
+        uses: "home-assistant/actions/hassfest@master"
