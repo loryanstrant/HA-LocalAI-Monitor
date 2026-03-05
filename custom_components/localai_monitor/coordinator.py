@@ -1,6 +1,6 @@
 """Data coordinator for the LocalAI Manager integration."""
 from asyncio import timeout
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
 import logging
 from typing import Any
@@ -111,6 +111,7 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
         self.api_key = api_key
         self.verify_ssl = verify_ssl
         self._hass = hass
+        self.last_update_success_time: datetime | None = None
 
         super().__init__(
             hass,
@@ -147,6 +148,7 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
                 if model_details:
                     data["model_details"] = model_details
                 
+                self.last_update_success_time = datetime.now(timezone.utc)
                 return data
 
         except aiohttp.ClientError as err:

@@ -24,6 +24,7 @@ ENDPOINT_RESOURCES = "/api/resources"
 SENSOR_BACKENDS = "backends"
 SENSOR_MODELS = "models"
 SENSOR_MODELS_JOBS = "models_jobs"
+SENSOR_RUNNING_MODELS = "running_models"
 SENSOR_SYSTEM = "system"
 SENSOR_RESOURCES = "resources"
 

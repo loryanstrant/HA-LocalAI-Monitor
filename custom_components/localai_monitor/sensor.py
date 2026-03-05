@@ -19,6 +19,7 @@ from .const import (
     SENSOR_MODELS,
     SENSOR_MODELS_JOBS,
     SENSOR_RESOURCES,
+    SENSOR_RUNNING_MODELS,
     SENSOR_SYSTEM,
 )
 from .coordinator import LocalAIDataUpdateCoordinator
@@ -38,6 +39,7 @@ async def async_setup_entry(
         LocalAIBackendsSensor(coordinator, entry),
         LocalAIModelsSensor(coordinator, entry),
         LocalAIModelsJobsSensor(coordinator, entry),
+        LocalAIRunningModelsSensor(coordinator, entry),
         LocalAISystemSensor(coordinator, entry),
         LocalAIResourcesSensor(coordinator, entry),
     ]
@@ -264,6 +266,45 @@ class LocalAIModelsJobsSensor(LocalAISensorBase):
         if jobs_list:
             attrs["jobs"] = jobs_list
         
+        return attrs
+
+
+class LocalAIRunningModelsSensor(LocalAISensorBase):
+    """Sensor for LocalAI running models."""
+
+    def __init__(
+        self,
+        coordinator: LocalAIDataUpdateCoordinator,
+        entry: ConfigEntry,
+    ) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry, SENSOR_RUNNING_MODELS)
+        self._attr_name = "Running Models"
+        self._attr_icon = "mdi:brain"
+
+    @property
+    def native_value(self) -> int:
+        """Return the number of running models."""
+        model_details = (self.coordinator.data or {}).get("model_details", {})
+        return sum(
+            1
+            for details in model_details.values()
+            if isinstance(details, dict) and details.get("status") == "Running"
+        )
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return additional state attributes."""
+        attrs = super().extra_state_attributes
+
+        model_details = (self.coordinator.data or {}).get("model_details", {})
+        running = [
+            {"name": name, "backend": details.get("backend", "unknown")}
+            for name, details in model_details.items()
+            if isinstance(details, dict) and details.get("status") == "Running"
+        ]
+        attrs["running_models"] = running
+
         return attrs
 
 
