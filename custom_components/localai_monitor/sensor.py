@@ -21,6 +21,7 @@ from .const import (
     SENSOR_RESOURCES,
     SENSOR_RUNNING_MODELS,
     SENSOR_SYSTEM,
+    SENSOR_VERSION,
 )
 from .coordinator import LocalAIDataUpdateCoordinator
 
@@ -42,6 +43,7 @@ async def async_setup_entry(
         LocalAIRunningModelsSensor(coordinator, entry),
         LocalAISystemSensor(coordinator, entry),
         LocalAIResourcesSensor(coordinator, entry),
+        LocalAIVersionSensor(coordinator, entry),
     ]
 
     async_add_entities(entities)
@@ -282,26 +284,33 @@ class LocalAIRunningModelsSensor(LocalAISensorBase):
         self._attr_name = "Running Models"
         self._attr_icon = "mdi:brain"
 
+    def _get_loaded_models(self) -> list[dict[str, Any]]:
+        """Extract loaded_models from system endpoint data."""
+        if not self.coordinator.data or SENSOR_SYSTEM not in self.coordinator.data:
+            return []
+        system_data = self.coordinator.data[SENSOR_SYSTEM]
+        if not isinstance(system_data, dict):
+            return []
+        loaded = system_data.get("loaded_models", [])
+        if isinstance(loaded, list):
+            return loaded
+        return []
+
     @property
     def native_value(self) -> int:
         """Return the number of running models."""
-        model_details = (self.coordinator.data or {}).get("model_details", {})
-        return sum(
-            1
-            for details in model_details.values()
-            if isinstance(details, dict) and details.get("status") == "Running"
-        )
+        return len(self._get_loaded_models())
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return additional state attributes."""
         attrs = super().extra_state_attributes
 
-        model_details = (self.coordinator.data or {}).get("model_details", {})
+        loaded_models = self._get_loaded_models()
         running = [
-            {"name": name, "backend": details.get("backend", "unknown")}
-            for name, details in model_details.items()
-            if isinstance(details, dict) and details.get("status") == "Running"
+            {"id": model.get("id", "unknown")}
+            for model in loaded_models
+            if isinstance(model, dict)
         ]
         attrs["running_models"] = running
 
@@ -474,3 +483,32 @@ class LocalAIResourcesSensor(LocalAISensorBase):
         attrs["watchdog_interval"] = data.get("watchdog_interval")
         
         return attrs
+
+
+class LocalAIVersionSensor(LocalAISensorBase):
+    """Sensor for LocalAI version."""
+
+    def __init__(
+        self,
+        coordinator: LocalAIDataUpdateCoordinator,
+        entry: ConfigEntry,
+    ) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry, SENSOR_VERSION)
+        self._attr_name = "Version"
+        self._attr_icon = "mdi:tag"
+
+    @property
+    def native_value(self) -> str:
+        """Return the LocalAI version."""
+        if not self.coordinator.data or SENSOR_VERSION not in self.coordinator.data:
+            return "unknown"
+
+        data = self.coordinator.data[SENSOR_VERSION]
+        if data is None:
+            return "unavailable"
+
+        if isinstance(data, dict):
+            return str(data.get("version", "unknown"))
+
+        return "unknown"
