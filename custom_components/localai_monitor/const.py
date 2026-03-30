@@ -19,6 +19,7 @@ ENDPOINT_MODELS = "/v1/models"
 ENDPOINT_MODELS_JOBS = "/models/jobs"
 ENDPOINT_SYSTEM = "/system"
 ENDPOINT_RESOURCES = "/api/resources"
+ENDPOINT_VERSION = "/version"
 
 # Sensor types
 SENSOR_BACKENDS = "backends"
@@ -27,6 +28,7 @@ SENSOR_MODELS_JOBS = "models_jobs"
 SENSOR_RUNNING_MODELS = "running_models"
 SENSOR_SYSTEM = "system"
 SENSOR_RESOURCES = "resources"
+SENSOR_VERSION = "version"
 
 # Attributes
 ATTR_LAST_UPDATE = "last_update"

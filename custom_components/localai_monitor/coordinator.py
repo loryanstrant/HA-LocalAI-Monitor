@@ -21,11 +21,13 @@ from .const import (
     ENDPOINT_MODELS_JOBS,
     ENDPOINT_SYSTEM,
     ENDPOINT_RESOURCES,
+    ENDPOINT_VERSION,
     SENSOR_BACKENDS,
     SENSOR_MODELS,
     SENSOR_MODELS_JOBS,
     SENSOR_SYSTEM,
     SENSOR_RESOURCES,
+    SENSOR_VERSION,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -142,6 +144,9 @@ class LocalAIDataUpdateCoordinator(DataUpdateCoordinator):
                 
                 # Fetch resources (undocumented)
                 data[SENSOR_RESOURCES] = await self._fetch_endpoint(session, ENDPOINT_RESOURCES)
+                
+                # Fetch version
+                data[SENSOR_VERSION] = await self._fetch_endpoint(session, ENDPOINT_VERSION)
                 
                 # Parse model details from /manage page HTML
                 model_details = await self._fetch_model_details(session)
