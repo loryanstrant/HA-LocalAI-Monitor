@@ -192,21 +192,22 @@ class LocalAIModelsSensor(LocalAISensorBase):
         if isinstance(data, dict) and "data" in data and isinstance(data["data"], list):
             model_ids = [model.get("id", "unknown") for model in data["data"] if isinstance(model, dict)]
             
-            # Get enriched model details from HTML parsing
-            model_details = self.coordinator.data.get("model_details", {})
+            # Determine running models from /system loaded_models
+            running_model_ids: set[str] = set()
+            system_data = self.coordinator.data.get(SENSOR_SYSTEM)
+            if isinstance(system_data, dict):
+                loaded = system_data.get("loaded_models", [])
+                if isinstance(loaded, list):
+                    for entry in loaded:
+                        if isinstance(entry, dict) and entry.get("id"):
+                            running_model_ids.add(entry["id"])
             
-            # Build enriched model list
+            # Build model list with running status
             for model_id in model_ids:
-                model_info = {"id": model_id}
-                
-                # Add details from HTML if available
-                if model_id in model_details:
-                    details = model_details[model_id]
-                    model_info["backend"] = details.get("backend", "unknown")
-                    model_info["status"] = details.get("status", "unknown")
-                    model_info["usecases"] = details.get("usecases", [])
-                    model_info["mcp_enabled"] = details.get("mcp_enabled", False)
-                
+                model_info = {
+                    "id": model_id,
+                    "status": "Running" if model_id in running_model_ids else "Idle",
+                }
                 model_list.append(model_info)
             
             attrs["models"] = model_list

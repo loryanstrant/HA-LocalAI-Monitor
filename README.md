@@ -7,10 +7,7 @@ NOTE: This is not for monitoring a "local AI", this is specifically for the prod
 ## Features
 
 - **Model Monitoring**: Track all installed models with detailed information including:
-  - Backend type (llama-cpp, whisper, stablediffusion, etc.)
   - Runtime status (Running, Idle)
-  - Use cases (Chat, TTS, Image, Audio)
-  - MCP (Model Context Protocol) status
   
 - **Backend Tracking**: Monitor installed backends and their metadata
 
@@ -59,7 +56,7 @@ The integration provides the following sensors:
 
 ### Installed Models
 - **State**: Number of installed models
-- **Attributes**: Detailed list of models with backend, status, use cases, and MCP status
+- **Attributes**: List of models with running/idle status (derived from `/system` loaded models)
 
 <img width="1803" height="954" alt="image" src="https://github.com/user-attachments/assets/d08cf45b-7a66-4025-a85f-1d390740bc15" />
 
@@ -139,20 +136,26 @@ entities:
 
 ## Technical Details
 
-- **Model Information Source**: The integration parses LocalAI's `/manage` page HTML to extract detailed model information (backend, status, use cases) since this data isn't available via the API
+- **Model Information Source**: Model running/idle status is determined via the `/system` API endpoint (`loaded_models` field), which replaced the previously used `/manage` HTML page that was removed in LocalAI v4.x.
 - **API Endpoints Used**:
   - `/v1/models` - Model list
   - `/backends` - Backend information
   - `/models/jobs` - Job status
-  - `/system` - System information
+  - `/system` - System information (including loaded/running models)
   - `/api/resources` - Resource usage
-  - `/manage` - HTML parsing for detailed model data
   - `/backend/shutdown` - Model shutdown endpoint
+  - `/backend/monitor` - Backend monitor (query parameter form, fixed in LocalAI v4.2.0)
 
 ## Requirements
 
 - Home Assistant 2025.10.0 or newer
-- A running LocalAI instance
+- LocalAI v4.2.0 or newer (confirmed working with v4.2.4+)
+
+## Compatibility
+
+This integration (v1.3.0+) requires LocalAI **v4.2.0 or newer**. Earlier versions of LocalAI included a `/manage` page that was used for model detail enrichment; this page was removed in v4.x. The integration now uses only the stable REST API endpoints.
+
+If you are running an older version of LocalAI, use integration version **1.2.0** or earlier.
 
 ## Support
 
