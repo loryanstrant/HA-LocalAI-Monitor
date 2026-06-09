@@ -11,6 +11,17 @@
           "scan_interval": "Scan Interval (seconds)",
           "name": "Name"
         }
+      },
+      "reconfigure": {
+        "title": "Reconfigure LocalAI Monitor",
+        "description": "Update the connection details for this LocalAI instance.",
+        "data": {
+          "url": "URL",
+          "api_key": "API Key (Optional)",
+          "verify_ssl": "Verify SSL Certificate",
+          "scan_interval": "Scan Interval (seconds)",
+          "name": "Name"
+        }
       }
     },
     "error": {
@@ -18,7 +29,8 @@
       "unknown": "An unexpected error occurred. Please check the logs."
     },
     "abort": {
-      "already_configured": "This LocalAI instance is already configured."
+      "already_configured": "This LocalAI instance is already configured.",
+      "reconfigure_successful": "Reconfiguration was successful."
     }
   },
   "options": {
