@@ -164,7 +164,12 @@ class LocalAIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     _LOGGER.exception("Unexpected exception during reconfigure")
                     errors["base"] = "unknown"
                 else:
-                    return self.async_update_reload_and_abort(
+                    # NB: async_update_and_abort (not ..._reload_and_abort) - this
+                    # integration registers an update listener that reloads on
+                    # change (__init__.py), so reloading here too would reload
+                    # twice, which HA deprecated (error from 2026.12). The listener
+                    # performs the single reload when entry.data changes.
+                    return self.async_update_and_abort(
                         reconfigure_entry,
                         title=user_input.get(CONF_NAME, DEFAULT_NAME),
                         unique_id=normalized_url,
