@@ -61,6 +61,17 @@ The integration provides the following sensors:
 <img width="1803" height="954" alt="image" src="https://github.com/user-attachments/assets/d08cf45b-7a66-4025-a85f-1d390740bc15" />
 
 
+### Running Models
+- **State**: Number of currently loaded (running) models
+- **Attributes**: List of running models, each enriched with:
+  - `backend` — the backend serving the model (e.g. `llama-cpp`, `vllm`, `whisper`), resolved from the model's config
+  - `vram_estimate_bytes` / `vram_estimate_gb` / `vram_estimate_display` — estimated VRAM the model uses while loaded
+  - `context_length` — context size used for the estimate
+  - `state` / `memory_bytes` / `memory_gb` — live backend process state and memory, when the backend implements the status RPC (best effort; absent for backends that don't, e.g. llama-cpp)
+- Also exposes `backends_in_use` (the distinct backends across all running models) and `total_estimated_vram_gb` (sum of the per-model estimates).
+
+> **Note on VRAM:** LocalAI does not expose measured per-model VRAM for most backends, so the per-model figure is an *estimate* derived from the model config. Measured, server-wide GPU/VRAM usage is available on the **Resources** sensor.
+
 ### Installed Backends
 - **State**: Number of installed backends
 - **Attributes**: List of backends with installation metadata
