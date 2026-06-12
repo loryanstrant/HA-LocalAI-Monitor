@@ -285,35 +285,60 @@ class LocalAIRunningModelsSensor(LocalAISensorBase):
         self._attr_name = "Running Models"
         self._attr_icon = "mdi:brain"
 
-    def _get_loaded_models(self) -> list[dict[str, Any]]:
-        """Extract loaded_models from system endpoint data."""
-        if not self.coordinator.data or SENSOR_SYSTEM not in self.coordinator.data:
+    def _get_running_models(self) -> list[dict[str, Any]]:
+        """Return the enriched running-models list built by the coordinator.
+
+        Each entry carries the model id and, where available, the backend
+        serving it and its VRAM usage. Falls back to the bare ids from
+        /system if the enriched list is missing (e.g. an older payload).
+        """
+        if not self.coordinator.data:
             return []
-        system_data = self.coordinator.data[SENSOR_SYSTEM]
-        if not isinstance(system_data, dict):
-            return []
-        loaded = system_data.get("loaded_models", [])
-        if isinstance(loaded, list):
-            return loaded
+
+        enriched = self.coordinator.data.get(SENSOR_RUNNING_MODELS)
+        if isinstance(enriched, list):
+            return enriched
+
+        # Fallback: derive bare ids from /system loaded_models.
+        system_data = self.coordinator.data.get(SENSOR_SYSTEM)
+        if isinstance(system_data, dict):
+            loaded = system_data.get("loaded_models", [])
+            if isinstance(loaded, list):
+                return [
+                    {"id": model.get("id", "unknown")}
+                    for model in loaded
+                    if isinstance(model, dict)
+                ]
         return []
 
     @property
     def native_value(self) -> int:
         """Return the number of running models."""
-        return len(self._get_loaded_models())
+        return len(self._get_running_models())
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return additional state attributes."""
         attrs = super().extra_state_attributes
 
-        loaded_models = self._get_loaded_models()
-        running = [
-            {"id": model.get("id", "unknown")}
-            for model in loaded_models
-            if isinstance(model, dict)
-        ]
+        running = self._get_running_models()
         attrs["running_models"] = running
+
+        # Convenience summaries: which backends are in use, and the total
+        # estimated VRAM across all running models.
+        backends = sorted(
+            {model["backend"] for model in running if model.get("backend")}
+        )
+        if backends:
+            attrs["backends_in_use"] = backends
+
+        total_vram = sum(
+            model["vram_estimate_bytes"]
+            for model in running
+            if isinstance(model.get("vram_estimate_bytes"), (int, float))
+        )
+        if total_vram:
+            attrs["total_estimated_vram_gb"] = round(total_vram / (1024**3), 2)
 
         return attrs
 

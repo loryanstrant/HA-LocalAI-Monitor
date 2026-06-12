@@ -20,6 +20,18 @@ ENDPOINT_MODELS_JOBS = "/models/jobs"
 ENDPOINT_SYSTEM = "/system"
 ENDPOINT_RESOURCES = "/api/resources"
 ENDPOINT_VERSION = "/version"
+# Per-model detail endpoints (used to enrich running models)
+ENDPOINT_MODEL_CONFIG = "/api/models/config-json/{name}"  # GET -> full model config (incl. backend)
+ENDPOINT_VRAM_ESTIMATE = "/api/models/vram-estimate"  # POST {"model": name} -> VRAM estimate
+ENDPOINT_BACKEND_MONITOR = "/backend/monitor"  # GET ?model=name -> live process memory/state (best effort)
+
+# Mapping for the numeric backend state returned by /backend/monitor
+BACKEND_STATE_NAMES = {
+    0: "uninitialized",
+    1: "busy",
+    2: "ready",
+    -1: "error",
+}
 
 # Sensor types
 SENSOR_BACKENDS = "backends"
