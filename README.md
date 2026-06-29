@@ -1,5 +1,15 @@
 # LocalAI Monitor - Home Assistant Integration
 
+[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5?style=flat-square)](https://github.com/hacs/integration)
+[![Release](https://img.shields.io/github/v/release/loryanstrant/HA-LocalAI-Monitor?style=flat-square)](https://github.com/loryanstrant/HA-LocalAI-Monitor/releases)
+[![Release date](https://img.shields.io/github/release-date/loryanstrant/HA-LocalAI-Monitor?style=flat-square)](https://github.com/loryanstrant/HA-LocalAI-Monitor/releases)
+[![Downloads](https://img.shields.io/github/downloads/loryanstrant/HA-LocalAI-Monitor/total?style=flat-square)](https://github.com/loryanstrant/HA-LocalAI-Monitor/releases)
+[![License](https://img.shields.io/github/license/loryanstrant/HA-LocalAI-Monitor?style=flat-square)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/loryanstrant/HA-LocalAI-Monitor?style=flat-square)](https://github.com/loryanstrant/HA-LocalAI-Monitor/commits)
+[![Stars](https://img.shields.io/github/stars/loryanstrant/HA-LocalAI-Monitor?style=flat-square)](https://github.com/loryanstrant/HA-LocalAI-Monitor/stargazers)
+
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=loryanstrant&repository=HA-LocalAI-Monitor&category=integration)
+
 A Home Assistant custom integration for monitoring [LocalAI](https://localai.io/) instances. Track installed models, backends, system resources, and manage running models directly from Home Assistant.
 
 NOTE: This is not for monitoring a "local AI", this is specifically for the product called "LocalAI", available from https://localai.io
@@ -51,7 +61,6 @@ Configure the integration through the UI:
 
 <img width="508" height="502" alt="image" src="https://github.com/user-attachments/assets/3bb9fecc-11d3-47f8-ba04-3b62edbbdb5b" />
 
-
 The integration provides the following sensors:
 
 ### Installed Models
@@ -59,7 +68,6 @@ The integration provides the following sensors:
 - **Attributes**: List of models with running/idle status (derived from `/system` loaded models)
 
 <img width="1803" height="954" alt="image" src="https://github.com/user-attachments/assets/d08cf45b-7a66-4025-a85f-1d390740bc15" />
-
 
 ### Running Models
 - **State**: Number of currently loaded (running) models
@@ -78,7 +86,6 @@ The integration provides the following sensors:
 
 <img width="1808" height="658" alt="image" src="https://github.com/user-attachments/assets/9f3de8e1-e98f-46bb-99ae-19894b382375" />
 
-
 ### System
 - **State**: System status
 - **Attributes**: System information from LocalAI
@@ -88,7 +95,6 @@ The integration provides the following sensors:
 - **Attributes**: Resource usage information
 
 <img width="1810" height="984" alt="Resource usage sensor screenshot in Home Assistant" src="https://github.com/user-attachments/assets/4c385b39-2145-4987-a044-bc87e713be35" />
-
 
 ### Model Jobs
 - **State**: Number of active jobs
@@ -112,7 +118,6 @@ data:
 
 <img width="1837" height="722" alt="image" src="https://github.com/user-attachments/assets/2080f51d-157a-48ee-8e25-6f59fc95d7ca" />
 
-
 ## Use Cases
 
 ### Automation Example: Shutdown Idle Models
@@ -128,7 +133,6 @@ automation:
         data:
           model_name: "gpt-4"
 ```
-
 
 ### Dashboard Example
 
