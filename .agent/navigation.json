@@ -1,0 +1,557 @@
+{
+  "schema_version": "1.0",
+  "repository": "HA-LocalAI-Monitor",
+  "identity": {
+    "description": "A Home Assistant custom integration for monitoring [LocalAI](https://localai.io/) instances. Track installed models, backends, system resources, and manage running models directly from Home Assistant.",
+    "default_branch": "main",
+    "languages": {
+      "Python": 5
+    },
+    "topics": [],
+    "licence": "MIT License",
+    "file_count": 18
+  },
+  "start_here": {
+    "readme": "README.md",
+    "agents_md": "AGENTS.md",
+    "entry_points": [],
+    "decision_records": [],
+    "build_config": [
+      "custom_components/localai_monitor/manifest.json",
+      "hacs.json"
+    ],
+    "source_roots": [
+      "custom_components"
+    ]
+  },
+  "documentation": [
+    {
+      "path": ".github/copilot-instructions.md",
+      "title": "Copilot instructions — HA-LocalAI-Monitor",
+      "lines": 37,
+      "headings": [
+        {
+          "level": 2,
+          "text": "What this repo is",
+          "anchor": "what-this-repo-is"
+        },
+        {
+          "level": 2,
+          "text": "Repo shape",
+          "anchor": "repo-shape"
+        },
+        {
+          "level": 2,
+          "text": "Housekeeping",
+          "anchor": "housekeeping"
+        },
+        {
+          "level": 2,
+          "text": "Conventions",
+          "anchor": "conventions"
+        },
+        {
+          "level": 2,
+          "text": "Never",
+          "anchor": "never"
+        }
+      ]
+    },
+    {
+      "path": "README.md",
+      "title": "LocalAI Monitor - Home Assistant Integration",
+      "lines": 189,
+      "headings": [
+        {
+          "level": 2,
+          "text": "Features",
+          "anchor": "features"
+        },
+        {
+          "level": 2,
+          "text": "Installation",
+          "anchor": "installation"
+        },
+        {
+          "level": 3,
+          "text": "HACS (Recommended)",
+          "anchor": "hacs-recommended"
+        },
+        {
+          "level": 3,
+          "text": "Manual Installation",
+          "anchor": "manual-installation"
+        },
+        {
+          "level": 2,
+          "text": "Configuration",
+          "anchor": "configuration"
+        },
+        {
+          "level": 2,
+          "text": "Sensors",
+          "anchor": "sensors"
+        },
+        {
+          "level": 3,
+          "text": "Installed Models",
+          "anchor": "installed-models"
+        },
+        {
+          "level": 3,
+          "text": "Running Models",
+          "anchor": "running-models"
+        },
+        {
+          "level": 3,
+          "text": "Installed Backends",
+          "anchor": "installed-backends"
+        },
+        {
+          "level": 3,
+          "text": "System",
+          "anchor": "system"
+        },
+        {
+          "level": 3,
+          "text": "Resources",
+          "anchor": "resources"
+        },
+        {
+          "level": 3,
+          "text": "Model Jobs",
+          "anchor": "model-jobs"
+        },
+        {
+          "level": 2,
+          "text": "Services",
+          "anchor": "services"
+        },
+        {
+          "level": 3,
+          "text": "localai_monitor.shutdown_model",
+          "anchor": "localai_monitorshutdown_model"
+        },
+        {
+          "level": 2,
+          "text": "Use Cases",
+          "anchor": "use-cases"
+        },
+        {
+          "level": 3,
+          "text": "Automation Example: Shutdown Idle Models",
+          "anchor": "automation-example-shutdown-idle-models"
+        },
+        {
+          "level": 3,
+          "text": "Dashboard Example",
+          "anchor": "dashboard-example"
+        },
+        {
+          "level": 2,
+          "text": "Technical Details",
+          "anchor": "technical-details"
+        },
+        {
+          "level": 2,
+          "text": "Requirements",
+          "anchor": "requirements"
+        },
+        {
+          "level": 2,
+          "text": "Compatibility",
+          "anchor": "compatibility"
+        },
+        {
+          "level": 2,
+          "text": "Support",
+          "anchor": "support"
+        },
+        {
+          "level": 2,
+          "text": "License",
+          "anchor": "license"
+        },
+        {
+          "level": 2,
+          "text": "Development Approach",
+          "anchor": "development-approach"
+        },
+        {
+          "level": 2,
+          "text": "Disclaimer",
+          "anchor": "disclaimer"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "source_roots": [
+      "custom_components"
+    ],
+    "symbol_source": "repomix (tree-sitter signatures)",
+    "routes": [],
+    "files": [
+      {
+        "path": "custom_components/localai_monitor/__init__.py",
+        "symbols": [
+          {
+            "kind": "const",
+            "name": "PLATFORMS",
+            "parent": "",
+            "signature": "PLATFORMS: list[Platform] = [Platform.SENSOR]"
+          },
+          {
+            "kind": "const",
+            "name": "SERVICE_SHUTDOWN_MODEL",
+            "parent": "",
+            "signature": "SERVICE_SHUTDOWN_MODEL = \"shutdown_model\""
+          },
+          {
+            "kind": "const",
+            "name": "SERVICE_SHUTDOWN_MODEL_SCHEMA",
+            "parent": "",
+            "signature": "SERVICE_SHUTDOWN_MODEL_SCHEMA = vol.Schema("
+          },
+          {
+            "kind": "function",
+            "name": "async_setup_entry",
+            "parent": "",
+            "signature": "async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool"
+          },
+          {
+            "kind": "function",
+            "name": "handle_shutdown_model",
+            "parent": "",
+            "signature": "handle_shutdown_model(call: ServiceCall) -> None"
+          },
+          {
+            "kind": "function",
+            "name": "async_unload_entry",
+            "parent": "",
+            "signature": "async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool"
+          },
+          {
+            "kind": "function",
+            "name": "update_listener",
+            "parent": "",
+            "signature": "update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None"
+          }
+        ]
+      },
+      {
+        "path": "custom_components/localai_monitor/config_flow.py",
+        "symbols": [
+          {
+            "kind": "function",
+            "name": "validate_input",
+            "parent": "",
+            "signature": "validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]"
+          },
+          {
+            "kind": "class",
+            "name": "LocalAIConfigFlow",
+            "parent": "",
+            "signature": "class LocalAIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN)"
+          },
+          {
+            "kind": "function",
+            "name": "async_step_import",
+            "parent": "LocalAIConfigFlow",
+            "signature": "async_step_import(self, user_input: dict[str, Any]) -> FlowResult"
+          },
+          {
+            "kind": "class",
+            "name": "LocalAIOptionsFlowHandler",
+            "parent": "",
+            "signature": "class LocalAIOptionsFlowHandler(config_entries.OptionsFlow)"
+          }
+        ]
+      },
+      {
+        "path": "custom_components/localai_monitor/const.py",
+        "symbols": [
+          {
+            "kind": "const",
+            "name": "DOMAIN",
+            "parent": "",
+            "signature": "DOMAIN = \"localai_monitor\""
+          },
+          {
+            "kind": "const",
+            "name": "DEFAULT_NAME",
+            "parent": "",
+            "signature": "DEFAULT_NAME = \"LocalAI Monitor\""
+          },
+          {
+            "kind": "const",
+            "name": "CONF_URL",
+            "parent": "",
+            "signature": "CONF_URL = \"url\""
+          },
+          {
+            "kind": "const",
+            "name": "CONF_API_KEY",
+            "parent": "",
+            "signature": "CONF_API_KEY = \"api_key\""
+          },
+          {
+            "kind": "const",
+            "name": "CONF_VERIFY_SSL",
+            "parent": "",
+            "signature": "CONF_VERIFY_SSL = \"verify_ssl\""
+          },
+          {
+            "kind": "const",
+            "name": "CONF_SCAN_INTERVAL",
+            "parent": "",
+            "signature": "CONF_SCAN_INTERVAL = \"scan_interval\""
+          },
+          {
+            "kind": "const",
+            "name": "DEFAULT_SCAN_INTERVAL",
+            "parent": "",
+            "signature": "DEFAULT_SCAN_INTERVAL = 60  # seconds"
+          },
+          {
+            "kind": "const",
+            "name": "DEFAULT_VERIFY_SSL",
+            "parent": "",
+            "signature": "DEFAULT_VERIFY_SSL = True"
+          },
+          {
+            "kind": "const",
+            "name": "ENDPOINT_BACKENDS",
+            "parent": "",
+            "signature": "ENDPOINT_BACKENDS = \"/backends\""
+          },
+          {
+            "kind": "const",
+            "name": "ENDPOINT_MODELS",
+            "parent": "",
+            "signature": "ENDPOINT_MODELS = \"/v1/models\""
+          },
+          {
+            "kind": "const",
+            "name": "ENDPOINT_MODELS_JOBS",
+            "parent": "",
+            "signature": "ENDPOINT_MODELS_JOBS = \"/models/jobs\""
+          },
+          {
+            "kind": "const",
+            "name": "ENDPOINT_SYSTEM",
+            "parent": "",
+            "signature": "ENDPOINT_SYSTEM = \"/system\""
+          },
+          {
+            "kind": "const",
+            "name": "ENDPOINT_RESOURCES",
+            "parent": "",
+            "signature": "ENDPOINT_RESOURCES = \"/api/resources\""
+          },
+          {
+            "kind": "const",
+            "name": "ENDPOINT_VERSION",
+            "parent": "",
+            "signature": "ENDPOINT_VERSION = \"/version\""
+          },
+          {
+            "kind": "const",
+            "name": "ENDPOINT_MODEL_CONFIG",
+            "parent": "",
+            "signature": "ENDPOINT_MODEL_CONFIG = \"/api/models/config-json/{name}\"  # GET -> full model config (incl. backend)"
+          },
+          {
+            "kind": "const",
+            "name": "ENDPOINT_VRAM_ESTIMATE",
+            "parent": "",
+            "signature": "ENDPOINT_VRAM_ESTIMATE = \"/api/models/vram-estimate\"  # POST {\"model\": name} -> VRAM estimate"
+          },
+          {
+            "kind": "const",
+            "name": "ENDPOINT_BACKEND_MONITOR",
+            "parent": "",
+            "signature": "ENDPOINT_BACKEND_MONITOR = \"/backend/monitor\"  # GET ?model=name -> live process memory/state (best effort)"
+          },
+          {
+            "kind": "const",
+            "name": "BACKEND_STATE_NAMES",
+            "parent": "",
+            "signature": "BACKEND_STATE_NAMES ="
+          },
+          {
+            "kind": "const",
+            "name": "SENSOR_BACKENDS",
+            "parent": "",
+            "signature": "SENSOR_BACKENDS = \"backends\""
+          },
+          {
+            "kind": "const",
+            "name": "SENSOR_MODELS",
+            "parent": "",
+            "signature": "SENSOR_MODELS = \"models\""
+          },
+          {
+            "kind": "const",
+            "name": "SENSOR_MODELS_JOBS",
+            "parent": "",
+            "signature": "SENSOR_MODELS_JOBS = \"models_jobs\""
+          },
+          {
+            "kind": "const",
+            "name": "SENSOR_RUNNING_MODELS",
+            "parent": "",
+            "signature": "SENSOR_RUNNING_MODELS = \"running_models\""
+          },
+          {
+            "kind": "const",
+            "name": "SENSOR_SYSTEM",
+            "parent": "",
+            "signature": "SENSOR_SYSTEM = \"system\""
+          },
+          {
+            "kind": "const",
+            "name": "SENSOR_RESOURCES",
+            "parent": "",
+            "signature": "SENSOR_RESOURCES = \"resources\""
+          },
+          {
+            "kind": "const",
+            "name": "SENSOR_VERSION",
+            "parent": "",
+            "signature": "SENSOR_VERSION = \"version\""
+          },
+          {
+            "kind": "const",
+            "name": "ATTR_LAST_UPDATE",
+            "parent": "",
+            "signature": "ATTR_LAST_UPDATE = \"last_update\""
+          }
+        ]
+      },
+      {
+        "path": "custom_components/localai_monitor/coordinator.py",
+        "symbols": [
+          {
+            "kind": "class",
+            "name": "LocalAIDataUpdateCoordinator",
+            "parent": "",
+            "signature": "class LocalAIDataUpdateCoordinator(DataUpdateCoordinator)"
+          }
+        ]
+      },
+      {
+        "path": "custom_components/localai_monitor/sensor.py",
+        "symbols": [
+          {
+            "kind": "class",
+            "name": "LocalAISensorBase",
+            "parent": "",
+            "signature": "class LocalAISensorBase(CoordinatorEntity, SensorEntity)"
+          },
+          {
+            "kind": "function",
+            "name": "device_info",
+            "parent": "LocalAISensorBase",
+            "signature": "device_info(self) -> DeviceInfo"
+          },
+          {
+            "kind": "function",
+            "name": "extra_state_attributes",
+            "parent": "LocalAISensorBase",
+            "signature": "extra_state_attributes(self) -> dict[str, Any]"
+          },
+          {
+            "kind": "class",
+            "name": "LocalAIBackendsSensor",
+            "parent": "",
+            "signature": "class LocalAIBackendsSensor(LocalAISensorBase)"
+          },
+          {
+            "kind": "function",
+            "name": "native_value",
+            "parent": "LocalAIBackendsSensor",
+            "signature": "native_value(self) -> int | str"
+          },
+          {
+            "kind": "class",
+            "name": "LocalAIModelsSensor",
+            "parent": "",
+            "signature": "class LocalAIModelsSensor(LocalAISensorBase)"
+          },
+          {
+            "kind": "class",
+            "name": "LocalAIModelsJobsSensor",
+            "parent": "",
+            "signature": "class LocalAIModelsJobsSensor(LocalAISensorBase)"
+          },
+          {
+            "kind": "class",
+            "name": "LocalAIRunningModelsSensor",
+            "parent": "",
+            "signature": "class LocalAIRunningModelsSensor(LocalAISensorBase)"
+          },
+          {
+            "kind": "function",
+            "name": "native_value",
+            "parent": "LocalAIRunningModelsSensor",
+            "signature": "native_value(self) -> int"
+          },
+          {
+            "kind": "class",
+            "name": "LocalAISystemSensor",
+            "parent": "",
+            "signature": "class LocalAISystemSensor(LocalAISensorBase)"
+          },
+          {
+            "kind": "function",
+            "name": "native_value",
+            "parent": "LocalAISystemSensor",
+            "signature": "native_value(self) -> str"
+          },
+          {
+            "kind": "class",
+            "name": "LocalAIResourcesSensor",
+            "parent": "",
+            "signature": "class LocalAIResourcesSensor(LocalAISensorBase)"
+          },
+          {
+            "kind": "function",
+            "name": "native_value",
+            "parent": "LocalAIResourcesSensor",
+            "signature": "native_value(self) -> float | None"
+          },
+          {
+            "kind": "function",
+            "name": "available",
+            "parent": "LocalAIResourcesSensor",
+            "signature": "available(self) -> bool"
+          },
+          {
+            "kind": "class",
+            "name": "LocalAIVersionSensor",
+            "parent": "",
+            "signature": "class LocalAIVersionSensor(LocalAISensorBase)"
+          }
+        ]
+      }
+    ]
+  },
+  "tests": [],
+  "operations": [
+    ".github/workflows/release.yml",
+    ".github/workflows/validate.yml"
+  ],
+  "limitations": {
+    "unparsed_languages": [],
+    "excluded_dirs": [],
+    "code_map_truncated": false,
+    "code_map_symbols_capped": true,
+    "tracked_files_only": true
+  },
+  "generated": {
+    "source_commit": "d19aa8023a2534cccaa0a289320dcedd25efc04a",
+    "content_hash": "edebb98f50a9509b",
+    "generator": "navgen"
+  }
+}
